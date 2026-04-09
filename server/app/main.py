@@ -56,3 +56,14 @@ def players() -> ApiEnvelope:
     items, source = provider.get_players()
     payload = cache.set("players", {"source": source, "items": items})
     return ApiEnvelope(source=payload["source"], cached=False, items=payload["items"])
+
+
+@app.get("/api/v1/pitchers", response_model=ApiEnvelope)
+def pitchers() -> ApiEnvelope:
+    cached_payload, hit = cache.get("pitchers")
+    if hit:
+        return ApiEnvelope(source=cached_payload["source"], cached=True, items=cached_payload["items"])
+
+    items, source = provider.get_pitchers()
+    payload = cache.set("pitchers", {"source": source, "items": items})
+    return ApiEnvelope(source=payload["source"], cached=False, items=payload["items"])

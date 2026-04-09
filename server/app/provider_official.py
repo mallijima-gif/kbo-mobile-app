@@ -6,12 +6,13 @@ from datetime import datetime
 import httpx
 from bs4 import BeautifulSoup
 
-from .models import GameSchedule, PlayerStat, TeamStanding
-from .sample_payloads import SAMPLE_PLAYERS, SAMPLE_SCHEDULES, SAMPLE_STANDINGS
+from .models import GameSchedule, PitcherStat, PlayerStat, TeamStanding
+from .sample_payloads import SAMPLE_PITCHERS, SAMPLE_PLAYERS, SAMPLE_SCHEDULES, SAMPLE_STANDINGS
 
 SCHEDULE_URL = "https://www.koreabaseball.com/Schedule/Schedule.aspx?seriesId=0,9"
 STANDINGS_URL = "https://www.koreabaseball.com/Record/TeamRank/TeamRankDaily.aspx"
 PLAYERS_URL = "https://www.koreabaseball.com/Record/Player/HitterBasic/Basic1.aspx"
+PITCHERS_URL = "https://www.koreabaseball.com/Record/Player/PitcherBasic/Basic1.aspx"
 
 
 class KboProvider:
@@ -41,6 +42,10 @@ class KboProvider:
     def get_players(self) -> tuple[list[PlayerStat], str]:
         data = self._parse_hitter_rank_page()
         return (data, "live") if data else (SAMPLE_PLAYERS, "sample")
+
+    def get_pitchers(self) -> tuple[list[PitcherStat], str]:
+        data = self._parse_pitcher_rank_page()
+        return (data, "live") if data else (SAMPLE_PITCHERS, "sample")
 
     def _fetch_html(self, url: str) -> str | None:
         try:
@@ -87,11 +92,11 @@ class KboProvider:
 
             stadium = self._clean_text(row[7].get("Text", "")) or "-"
             game = GameSchedule(
-                    date_label=date_label,
-                    time=time or "-",
-                    away_team=away_team,
-                    home_team=home_team,
-                    stadium=stadium,
+                date_label=date_label,
+                time=time or "-",
+                away_team=away_team,
+                home_team=home_team,
+                stadium=stadium,
             )
             games.append((self._date_key(date_label), game))
 
@@ -160,6 +165,37 @@ class KboProvider:
             )
 
         return players[:20]
+
+    def _parse_pitcher_rank_page(self) -> list[PitcherStat]:
+        html = self._fetch_html(PITCHERS_URL)
+        if not html:
+            return []
+
+        soup = BeautifulSoup(html, "html.parser")
+        table = soup.select_one("table.tData01") or soup.select_one("table")
+        if table is None:
+            return []
+
+        pitchers: list[PitcherStat] = []
+        for row in table.select("tbody tr"):
+            cells = [cell.get_text(" ", strip=True) for cell in row.select("td")]
+            if len(cells) < 16 or not cells[0].isdigit():
+                continue
+
+            pitchers.append(
+                PitcherStat(
+                    rank=int(cells[0]),
+                    name=cells[1],
+                    team_name=cells[2],
+                    era=cells[3],
+                    wins=self._to_int(cells[5]),
+                    saves=self._to_int(cells[7]),
+                    innings_pitched=cells[10],
+                    strikeouts=self._to_int(cells[15]),
+                )
+            )
+
+        return pitchers[:20]
 
     @staticmethod
     def _split_matchup(value: str) -> tuple[str, str]:

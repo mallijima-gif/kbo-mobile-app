@@ -30,6 +30,17 @@ class PlayerStat(BaseModel):
     rbis: int
 
 
+class PitcherStat(BaseModel):
+    rank: int
+    name: str
+    team_name: str
+    era: str
+    wins: int
+    saves: int
+    innings_pitched: str
+    strikeouts: int
+
+
 class ApiEnvelope(BaseModel):
     source: str
     cached: bool
