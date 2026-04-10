@@ -7,6 +7,8 @@ class GameSchedule(BaseModel):
     home_team: str
     away_team: str
     stadium: str
+    status: str = "예정"
+    broadcast: str = "-"
 
 
 class TeamStanding(BaseModel):

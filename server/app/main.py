@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .cache import MemoryCache
 from .models import ApiEnvelope
-from .provider_official import KboProvider
+from .provider_live import KboProvider
 
 app = FastAPI(title="KBO Mobile API", version="0.1.0")
 app.add_middleware(

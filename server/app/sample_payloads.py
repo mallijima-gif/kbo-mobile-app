@@ -2,9 +2,11 @@ from .models import GameSchedule, PitcherStat, PlayerStat, TeamStanding
 
 
 SAMPLE_SCHEDULES = [
-    GameSchedule(date_label="4월 9일", time="18:30", home_team="두산", away_team="LG", stadium="잠실"),
-    GameSchedule(date_label="4월 9일", time="18:30", home_team="롯데", away_team="SSG", stadium="사직"),
-    GameSchedule(date_label="4월 9일", time="18:30", home_team="한화", away_team="KIA", stadium="대전"),
+    GameSchedule(date_label="04.10(금)", time="18:30", home_team="한화", away_team="KIA", stadium="대전", status="예정", broadcast="KBS N SPORTS"),
+    GameSchedule(date_label="04.10(금)", time="18:30", home_team="키움", away_team="롯데", stadium="고척", status="예정", broadcast="KBS LIFE | TVING"),
+    GameSchedule(date_label="04.10(금)", time="18:30", home_team="삼성", away_team="NC", stadium="대구", status="예정", broadcast="MBC SPORTS+"),
+    GameSchedule(date_label="04.10(금)", time="18:30", home_team="KT", away_team="두산", stadium="수원", status="예정", broadcast="SBS SPORTS | SPOTV2"),
+    GameSchedule(date_label="04.10(금)", time="18:30", home_team="LG", away_team="SSG", stadium="잠실", status="예정", broadcast="SPOTV"),
 ]
 
 SAMPLE_STANDINGS = [
